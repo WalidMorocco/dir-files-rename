@@ -1,21 +1,18 @@
 import os
 
 def rename_files_and_dirs(directory_path, old_char, new_char, recursive=False):
-    if recursive:
-        # Process files first, then directories
-        for dirpath, dirnames, filenames in os.walk(directory_path):
-            # Rename files
-            for filename in filenames:
-                rename_if_needed(dirpath, filename, old_char, new_char)
-        
-        # Now rename directories from the deepest level up
-        for dirpath, dirnames, filenames in sorted(os.walk(directory_path, topdown=False), key=lambda x: x[0]):
-            # Rename subdirectories
-            for dirname in dirnames:
-                rename_if_needed(dirpath, dirname, old_char, new_char)
-    else:
-        # Only process files and directories in the top-level directory
-        for name in os.listdir(directory_path):
+    # Rename files in the current directory
+    for name in os.listdir(directory_path):
+        full_path = os.path.join(directory_path, name)
+        if os.path.isfile(full_path):
+            rename_if_needed(directory_path, name, old_char, new_char)
+
+    # Handle directories
+    for name in os.listdir(directory_path):
+        full_path = os.path.join(directory_path, name)
+        if os.path.isdir(full_path):
+            if recursive:
+                rename_files_and_dirs(full_path, old_char, new_char, recursive=True)
             rename_if_needed(directory_path, name, old_char, new_char)
 
 def rename_if_needed(dirpath, name, old_char, new_char):
